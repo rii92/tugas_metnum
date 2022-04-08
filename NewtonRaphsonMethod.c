@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 
-float hasilFungsi(float a, float x[]);
-float hasilTurunanFungsi(float a, float x[]);
+float hasilFungsi(float pNol, float x[]);
+float hasilTurunanFungsi(float pNol, float x[]);
 
 int main()
 {
@@ -25,12 +25,12 @@ int main()
     }
 
     // metode newton raphson
-    float a;                       // a: approximasi
+    float pNol, p;                 // a: approximasi
     unsigned short i = 1, iterasi; // iterasi: angka maksimum iterasi
     float epsilon;                 // epsilon: batas error(angka toleransi)
 
     printf("Apporximasi pertama: ");
-    scanf("%f", &a);
+    scanf("%f", &pNol);
 
     printf("angka iterasi: ");
     scanf("%hu", &iterasi);
@@ -38,32 +38,36 @@ int main()
     printf("angka toleransi/epsilon (batas sampai 6 tempat desimal!): ");
     scanf("%f", &epsilon);
 
-    while (i <= iterasi)
+    for (int i = 1; i <= iterasi; i++)
     {
-        a = a - hasilFungsi(a, x) / hasilTurunanFungsi(a, x);
-        i++;
+        p = pNol - (hasilFungsi(pNol, x) / hasilTurunanFungsi(pNol, x));
+        printf("\niterasi ke-%d: %.6f", i, p);
+        if (fabs(p - pNol) < epsilon)
+        {
+            printf("\n\nApproximasi: %.6f", p);
+            break;
+        }
+        pNol = p;
     }
-
-    printf("akar aproximasi: %f \n", x);
-    return 0;
+    printf("\nProsedur tidak sukses untuk toleransi %.6f", epsilon);
 }
 
-float hasilFungsi(float a, float x[])
+float hasilFungsi(float pNol, float x[])
 {
     float hasil_fungsi = 0;
     for (int i = 0; i <= sizeof(x); i++)
     {
-        hasil_fungsi += x[i] * pow(a, i);
+        hasil_fungsi += x[i] * pow(pNol, i);
     }
     return hasil_fungsi;
 }
 
-float hasilTurunanFungsi(float a, float x[])
+float hasilTurunanFungsi(float pNol, float x[])
 {
     float hasil_turunan = 0;
     for (int i = 0; i <= sizeof(x); i++)
     {
-        hasil_turunan += x[i] * i * pow(a, i - 1);
+        hasil_turunan += x[i] * i * pow(pNol, i - 1);
     }
     return hasil_turunan;
 }
