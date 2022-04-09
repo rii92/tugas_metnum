@@ -23,13 +23,15 @@ int main(void)
     }
 
     // input batas bawah dan batas atas
-    float a, b;
+    float a, b, Nnol;
     printf("\ninput batas bawah: ");
     scanf("%f", &a);
     printf("input batas atas: ");
     scanf("%f", &b);
+    printf("input nilai iterasi maksimum: ");
+    scanf("%f", &Nnol);
 
-    // menghitung fungsi
+        // menghitung fungsi
     float f_a = 0, f_b = 0;
     for (int i = 0; i <= n; i++)
     {
