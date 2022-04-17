@@ -3,6 +3,7 @@
 
 float hasilFungsi(float pNol, float x[]);
 float hasilTurunanFungsi(float pNol, float x[]);
+float fungsiToX(float pNol, float x[]);
 void metodeNewtonRaphson();
 void metodeBiseksi();
 void metodeIterasiSederhana();
@@ -74,6 +75,28 @@ float hasilTurunanFungsi(float pNol, float x[])
         hasil_turunan += x[i] * i * pow(pNol, i - 1);
     }
     return hasil_turunan;
+}
+
+// f(x)=0 menjadi x=F(x)
+float fungsiToX(float pNol, float x[])
+{
+    float pangkat;
+    float hasilPerubahanFungsi = 0;
+    for (int i = 1; i <= sizeof(x); i++)
+    {
+
+        if (x[i] == !0)
+        {
+            for (int j = 0; j <= sizeof(x); j++)
+            {
+                hasilPerubahanFungsi += x[j] * pow(pNol, j);
+            }
+            hasilPerubahanFungsi -= x[i] * pow(pNol, i);
+            hasilPerubahanFungsi = hasilPerubahanFungsi / x[i];
+            hasilPerubahanFungsi = pow(hasilPerubahanFungsi, 1 / i);
+            return hasilPerubahanFungsi;
+        }
+    }
 }
 
 // metode newton raphson
@@ -274,14 +297,21 @@ void metodeIterasiAitken()
 
     printf("angka toleransi/epsilon (batas sampai 6 tempat desimal!): ");
     scanf("%f", &epsilon);
+    float deltaXN[iterasi];
+    float deltakuadrat;
+    pNol = 0;
 
     for (int i = 1; i <= iterasi; i++)
     {
-        p = hasilFungsi(pNol, x);
+        p = fungsiToX(pNol, x);
         printf("\niterasi ke-%d: %.6f", i, p);
-        if (fabs(p - pNol) < epsilon)
+        deltaXN[i] = fabs(p - pNol);
+        if (deltaXN[i] < epsilon)
         {
-            printf("\n\nApproximasi: %.6f", p);
+            // float deltaX = deltaXN[i - 1];
+            // float deltakuadratX = deltaXN[i - 1] - deltaXN[i - 2];
+            // p = p - pow(deltaX, 2) / (deltakuadratX);
+            printf("\n\nApproximasi x: %.6f", p);
             return 0;
         }
         pNol = p;
