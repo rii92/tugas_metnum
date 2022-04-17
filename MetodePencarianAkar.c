@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <math.h>
 
-float hasilFungsi(float pNol, float x[]);
-float hasilTurunanFungsi(float pNol, float x[]);
-float fungsiToX(float pNol, float x[]);
+float hasilFungsi(float pNol, float x[], int n);
+float hasilTurunanFungsi(float pNol, float x[], int n);
+float fungsiToX(float pNol, float x[], int index, int n);
 void metodeNewtonRaphson();
 void metodeBiseksi();
 void metodeIterasiSederhana();
@@ -56,10 +56,10 @@ int main()
 }
 
 // menghitung fungsi
-float hasilFungsi(float pNol, float x[])
+float hasilFungsi(float pNol, float x[], int n)
 {
     float hasil_fungsi = 0;
-    for (int i = 0; i <= sizeof(x); i++)
+    for (int i = 0; i <= n; i++)
     {
         hasil_fungsi += x[i] * pow(pNol, i);
     }
@@ -67,10 +67,10 @@ float hasilFungsi(float pNol, float x[])
 }
 
 // menghitung turunan fungsi
-float hasilTurunanFungsi(float pNol, float x[])
+float hasilTurunanFungsi(float pNol, float x[], int n)
 {
     float hasil_turunan = 0;
-    for (int i = 0; i <= sizeof(x); i++)
+    for (int i = 0; i <= n; i++)
     {
         hasil_turunan += x[i] * i * pow(pNol, i - 1);
     }
@@ -78,25 +78,17 @@ float hasilTurunanFungsi(float pNol, float x[])
 }
 
 // f(x)=0 menjadi x=F(x)
-float fungsiToX(float pNol, float x[])
+float fungsiToX(float pNol, float x[], int index, int n)
 {
-    float pangkat;
-    float hasilPerubahanFungsi = 0;
-    for (int i = 1; i <= sizeof(x); i++)
+    float hasil_fungsi = 0;
+    for (int i = 0; i <= n; i++)
     {
-
-        if (x[i] == !0)
-        {
-            for (int j = 0; j <= sizeof(x); j++)
-            {
-                hasilPerubahanFungsi += x[j] * pow(pNol, j);
-            }
-            hasilPerubahanFungsi -= x[i] * pow(pNol, i);
-            hasilPerubahanFungsi = hasilPerubahanFungsi / x[i];
-            hasilPerubahanFungsi = pow(hasilPerubahanFungsi, 1 / i);
-            return hasilPerubahanFungsi;
-        }
+        hasil_fungsi += x[i] * pow(pNol, i);
     }
+    hasil_fungsi = hasil_fungsi - x[index] * pow(pNol, index);
+    hasil_fungsi = hasil_fungsi / (x[index] * (-1));
+    hasil_fungsi = pow(hasil_fungsi, 1 / index);
+    return hasil_fungsi;
 }
 
 // metode newton raphson
@@ -136,7 +128,7 @@ void metodeNewtonRaphson()
 
     for (int i = 1; i <= iterasi; i++)
     {
-        p = pNol - (hasilFungsi(pNol, x) / hasilTurunanFungsi(pNol, x));
+        p = pNol - (hasilFungsi(pNol, x, n) / hasilTurunanFungsi(pNol, x, n));
         printf("\niterasi ke-%d: %.6f", i, p);
         if (fabs(p - pNol) < epsilon)
         {
@@ -190,9 +182,9 @@ void metodeBiseksi()
     for (int i = 1; i <= iterasi; i++)
     {
         p = (a + b) / 2;
-        fa = hasilFungsi(a, x);
-        fb = hasilFungsi(b, x);
-        fp = hasilFungsi(p, x);
+        fa = hasilFungsi(a, x, n);
+        fb = hasilFungsi(b, x, n);
+        fp = hasilFungsi(p, x, n);
         printf("\niterasi ke-%d: %.6f", i, p);
         if (fabs(fp) < epsilon)
         {
@@ -247,16 +239,21 @@ void metodeIterasiSederhana()
     printf("angka toleransi/epsilon (batas sampai 6 tempat desimal!): ");
     scanf("%f", &epsilon);
 
-    for (int i = 1; i <= iterasi; i++)
+    for (int j = 1; j <= n; j++)
     {
-        p = hasilFungsi(pNol, x);
-        printf("\niterasi ke-%d: %.6f", i, p);
-        if (fabs(p - pNol) < epsilon)
+        printf("Polinomial ke-%d: ", j);
+        for (int i = 1; i <= iterasi; i++)
         {
-            printf("\n\nApproximasi: %.6f", p);
-            return 0;
+            p = fungsiToX(pNol, x, j, n);
+            printf("\niterasi ke-%d: %.6f", i, p);
+            if (fabs(p - pNol) < epsilon)
+            {
+                printf("\n\nApproximasi: %.6f", p);
+                return 0;
+            }
+            pNol = p;
         }
-        pNol = p;
+        printf("\n\n");
     }
 
     printf("\nProsedur tidak sukses untuk toleransi %.6f", epsilon);
@@ -297,24 +294,44 @@ void metodeIterasiAitken()
 
     printf("angka toleransi/epsilon (batas sampai 6 tempat desimal!): ");
     scanf("%f", &epsilon);
-    float deltaXN[iterasi];
+    float nilaiX[3];
+    float delta1;
+    float delta2;
     float deltakuadrat;
-    pNol = 0;
+    float solusi;
 
-    for (int i = 1; i <= iterasi; i++)
+    for (int j = 1; j <= n; j++)
     {
-        p = fungsiToX(pNol, x);
-        printf("\niterasi ke-%d: %.6f", i, p);
-        deltaXN[i] = fabs(p - pNol);
-        if (deltaXN[i] < epsilon)
+        printf("Polinomial ke-%d: ", j);
+        for (int i = 1; i <= iterasi; i++)
         {
-            // float deltaX = deltaXN[i - 1];
-            // float deltakuadratX = deltaXN[i - 1] - deltaXN[i - 2];
-            // p = p - pow(deltaX, 2) / (deltakuadratX);
-            printf("\n\nApproximasi x: %.6f", p);
-            return 0;
+            p = fungsiToX(pNol, x, j, n);
+            printf("\niterasi ke-%d: %.6f", i, p);
+            if (i == 1)
+            {
+                nilaiX[0] = p;
+                nilaiX[1] = p;
+                nilaiX[2] = p;
+            }
+            else
+            {
+                nilaiX[0] = nilaiX[1];
+                nilaiX[1] = nilaiX[2];
+                nilaiX[2] = p;
+            }
+
+            if (fabs(p - pNol) < epsilon)
+            {
+                delta1 = nilaiX[1] - nilaiX[0];
+                delta2 = nilaiX[2] - nilaiX[1];
+                deltakuadrat = delta2 - delta1;
+                solusi = nilaiX[2] - pow(delta2, 2) / deltakuadrat;
+                printf("\nsolusi rill: %.6f", solusi);
+                return 0;
+            }
+            pNol = p;
         }
-        pNol = p;
+        printf("\n\n");
     }
 
     printf("\nProsedur tidak sukses untuk toleransi %.6f", epsilon);
@@ -360,14 +377,14 @@ void metodeRegularFalsi()
 
     for (int i = 1; i <= iterasi; i++)
     {
-        p = (a * hasilFungsi(b, x) - b * hasilFungsi(a, x)) / (hasilFungsi(b, x) - hasilFungsi(a, x));
+        p = (a * hasilFungsi(b, x, n) - b * hasilFungsi(a, x, n)) / (hasilFungsi(b, x, n) - hasilFungsi(a, x, n));
         printf("\niterasi ke-%d: %.6f", i, p);
         if (fabs(p - a) < epsilon)
         {
             printf("\n\nApproximasi: %.6f", p);
             return 0;
         }
-        if (hasilFungsi(a, x) * hasilFungsi(p, x) < 0)
+        if (hasilFungsi(a, x, n) * hasilFungsi(p, x, n) < 0)
         {
             b = p;
         }
