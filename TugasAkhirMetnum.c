@@ -5,6 +5,19 @@ float titik[100][100];
 float cvalue[100];
 float koef[100];
 float xvalue[100];
+float valueTurunan[100][100];
+//kolom 0: nomor
+//kolom 1: x
+//kolom 2: y
+//kolom 3: y' 2 selisih maju
+//kolom 4: y' 2 selisih mundur
+//kolom 5: y' 3 selisih maju
+//kolom 6: y' 3 selisih mundur
+//kolom 7: y' selisih tengah/terpusat
+//kolom 8: y' 5 selisih maju
+//kolom 9: y' 5 selisih mundur
+//kolom 10: y' 5 selisih tengah
+
 
 void aproxFungsi();
 void aproxTurunan();
@@ -22,6 +35,16 @@ float hasilFungsi(int m, float x);
 float integrasiMidpoint(int m, float a, float b);
 float integrasiTrapesium(int m, float a, float b);
 float integrasiSimpson(int m, float a, float b);
+void valuexyforTurunan(float a, float b, float h, int m, int jumlahtitik);
+void duaselisihmaju(int jumlahTitik, float h);
+void duaselisihmundur(int jumlahTitik, float h);
+void printTurunan(int a, int jumlahtitik);
+void selisihtengah(int jumlahTitik, float h);
+void tigaselisihmaju(int jumlahTitik, float h);
+void tigaselisihmundur(int jumlahTitik, float h);
+void limaselisihmaju(int jumlahTitik, float h);
+void limaselisihmundur(int jumlahTitik, float h);
+void limaselisihtengah(int jumlahTitik, float h);
 
 
 int main()
@@ -96,8 +119,130 @@ void aproxFungsi(){ // Approximasi Fungsi
 
 
 void aproxTurunan(){ // Approximasi Turunan
-    //Ada fungsi?
-    return 0;
+    printf("Approximasi Integral\n");
+    printf("===================\n");
+    printf("\n");
+    printf("Pilih kondisi:\n");
+    printf("1. Memiliki fungsi yang bisa langsung bisa diturunkan\n");
+    printf("2. hanya memiliki beberapa titik untuk di bentuk fungsi polinomial\n");
+    char answer;
+    scanf("%s", &answer);
+    printf("\n");
+    int m;
+    if (answer == '2'){
+        printf("Masukkan jumlah titik yang diketahui : ");
+        scanf("%d", &m);
+        printf("\n");
+        menentukanTitik(m);
+        for (int i = 0; i < m; i++){ //testing
+            printf("titik x%d dan y%d = %.2f dan %.2f\n", i + 1, i + 1, titik[0][i], titik[1][i]);
+        }
+        //Cari C value
+        menentukanValueC(m);
+        
+        //bentuk power polinomial
+        bentukPower(m);
+
+        printf("\nfungsi yang didapat:\n");
+        printFungsi(m);
+    }
+    else if (answer == '1'){
+        printf("Masukkan jumlah derajat fungsi?\n");
+        scanf("%d", &m);
+        printf("\n");
+        m = m + 1;
+        for (int i = 0; i < m; i++)
+        {
+            printf("Masukkan koefisien x^%d : ", i);
+            scanf("%f", &koef[i]);
+        }
+        printFungsi(m);
+    } else {
+        printf("Pilihan tidak tersedia\n");
+        return 0;
+    }
+
+    printf("\nMasukkan rentang nilai antara a dan b (pisah spasi): ");
+    float a, b;
+    scanf("%f %f", &a, &b);
+    printf("\n");
+    printf("masukkan jarak step h: ");
+    float h;
+    scanf("%f", &h);
+    printf("\n");
+    int jumlahTitik = (b - a) / h;
+    valuexyforTurunan(a, b, h, m, jumlahTitik);
+    int ch;
+    while (1)
+    {
+    printf("\nPilih Metode turunan:\n");
+    printf("1. 2 selisih maju\n");
+    printf("2. 2 selisih mundur\n");
+    printf("3. 3 selisih maju\n");
+    printf("4. 3 selisih mundur\n");
+    printf("5. selisih tengah/terpusat\n");
+    printf("6. 5 selisih maju\n");
+    printf("7. 5 selisih mundur\n");
+    printf("8. 5 selisih terpusat\n");
+    printf("9. exit\n");
+    printf("Pilih menu : ");
+    scanf("%d", &ch);
+        printf("\n");
+        printf("\n");
+        switch (ch)
+        {
+        case 1:
+            duaselisihmaju(jumlahTitik, h);
+            printf("hasil dua selisih maju: \n");
+            printTurunan(3, jumlahTitik);
+            break;
+        case 2:
+            duaselisihmundur(jumlahTitik, h);
+            printf("hasil dua selisih mundur: \n");
+            printTurunan(4, jumlahTitik);
+            break;
+        case 3:
+            tigaselisihmaju(jumlahTitik, h);
+            printf("hasil tiga selisih maju: \n");
+            printTurunan(5, jumlahTitik);
+            break;
+        case 4:
+            tigaselisihmundur(jumlahTitik, h);
+            printf("hasil tiga selisih mundur: \n");
+            printTurunan(6, jumlahTitik);
+            break;
+        case 5:
+            selisihtengah(jumlahTitik, h);
+            printf("hasil selisih tengah/terpusat: \n");
+            printTurunan(7, jumlahTitik);
+            break;
+        case 6:
+            limaselisihmaju(jumlahTitik, h);
+            printf("hasil 5 selisih maju: \n");
+            printTurunan(8, jumlahTitik);
+            break;
+        case 7:
+            limaselisihmundur(jumlahTitik, h);
+            printf("hasil 5 selisih mundur: \n");
+            printTurunan(9, jumlahTitik);
+            break;
+        case 8:
+            limaselisihtengah(jumlahTitik, h);
+            printf("hasil 5 selisih terpusat/tengah: \n");
+            printTurunan(10, jumlahTitik);
+            break;;
+        case 9:
+            return 1;
+        default:
+            printf("Menu pilihan tidak disediakan\n");
+        }
+        printf("\nTekan tombol apapun untuk melanjutkan...\n");
+        getch(); 
+    }
+    
+    refresh(m);
+    refresh(jumlahTitik);
+    return 0;   
 }
 
 
@@ -158,6 +303,7 @@ void aproxIntegral(){ // Approximasi Integral
     printf("3. Simpson = %.2f \n", integrasiSimpson(m, a, b));
     
     refresh(m);
+    return 0;
 }
 
 void menentukanTitik(int m){
@@ -241,6 +387,10 @@ void refresh(int m){
         cvalue[i] = 0;
         koef[i] = 0;
         xvalue[i] = 0;
+        for (int j = 0; i < 11; i++)
+        {
+            valueTurunan[j][i];            
+        }
     }   
 }
 
@@ -325,7 +475,6 @@ float integrasiMidpoint(int m, float a, float b){
     float range = (b-a)/2;
     float mid = a + range;
     float hasil = 2*range*hasilFungsi(jumlahtitik, mid);
-    printf("%.2f\n", hasilFungsi(jumlahtitik, mid));
     return hasil;
 }
 
@@ -346,4 +495,119 @@ float integrasiSimpson(int m, float a, float b){
     float mid = batasBawah - range;
     float hasil = range*(hasilFungsi(jumlahtitik, batasBawah) + 4*hasilFungsi(jumlahtitik, mid) + hasilFungsi(jumlahtitik, batasAtas))/3;
     return hasil;
+}
+
+void valuexyforTurunan(float a, float b, float h, int m, int jumlahtitik){
+    float j = a;
+    for (int i = 0; i < jumlahtitik; i++)
+    {
+        valueTurunan[0][i] = i;
+        valueTurunan[1][i] = j;
+        valueTurunan[2][i] = hasilFungsi(m, j);
+        j += h;
+    }
+}
+
+void duaselisihmundur(int jumlahTitik, float h){
+    for (int i = 0; i < jumlahTitik; i++)
+    {
+        if (i==0)
+        {
+            valueTurunan[4][i] = 0;
+        } else{
+            valueTurunan[4][i] = (valueTurunan[2][i] - valueTurunan[2][i-1])/h;
+        }
+    }
+}
+
+void printTurunan(int a, int jumlahtitik){
+    printf (" | %4s | %4s | %4s | %4s |\n\n", "i", "xi", "y", "y\'");
+    for (int i = 0; i < jumlahtitik; i++)
+    {
+        printf (" | %3.2f | %3.2f | %3.2f | %3.2f |\n", valueTurunan[0][i], valueTurunan[1][i], valueTurunan[2][i], valueTurunan[a][i]);
+    }
+}
+
+void duaselisihmaju(int jumlahTitik, float h){
+    for (int i = 0; i < jumlahTitik; i++)
+    {
+        if (i==jumlahTitik-1)
+        {
+            valueTurunan[3][i] = 0;
+        } else{
+            valueTurunan[3][i] = (valueTurunan[2][i] - valueTurunan[2][i+1])/h;
+        }
+    }
+}
+
+void selisihtengah(int jumlahTitik, float h){
+    for (int i = 0; i < jumlahTitik; i++)
+    {
+        if (i==jumlahTitik-1 || i==0)
+        {
+            valueTurunan[7][i] = 0;
+        } else{
+            valueTurunan[7][i] = (valueTurunan[2][i+1] - valueTurunan[2][i-1])/(2*h);
+        }
+    }
+}
+
+void tigaselisihmaju(int jumlahTitik, float h){
+    for (int i = 0; i < jumlahTitik; i++)
+    {
+        if (i==jumlahTitik-1 || i==jumlahTitik-2)
+        {
+            valueTurunan[5][i] = 0;
+        } else{
+            valueTurunan[5][i] = (-3*valueTurunan[2][i] + 4*valueTurunan[2][i+1] - valueTurunan[2][i+2])/(2*h);
+        }
+    }
+}
+
+void tigaselisihmundur(int jumlahTitik, float h){
+    for (int i = 0; i < jumlahTitik; i++)
+    {
+        if (i==0 || i==1)
+        {
+            valueTurunan[6][i] = 0;
+        } else{
+            valueTurunan[6][i] = (3*valueTurunan[2][i] - 4*valueTurunan[2][i-1] + valueTurunan[2][i-2])/(2*h);
+        }
+    }
+}
+
+void limaselisihmaju(int jumlahTitik, float h){
+    for (int i = 0; i < jumlahTitik; i++)
+    {
+        if (i>jumlahTitik-5)
+        {
+            valueTurunan[8][i] = 0;
+        } else{
+            valueTurunan[8][i] = (-25*valueTurunan[2][i] + 48*valueTurunan[2][i+1] - 36*valueTurunan[2][i+2] + 16*valueTurunan[2][i+3] - 3*valueTurunan[2][i+4])/(12*h);
+        }
+    }
+}
+
+void limaselisihmundur(int jumlahTitik, float h){
+    for (int i = 0; i < jumlahTitik; i++)
+    {
+        if (i < 4)
+        {
+            valueTurunan[9][i] = 0;
+        } else{
+            valueTurunan[9][i] = (25*valueTurunan[2][i] - 48*valueTurunan[2][i+1] + 36*valueTurunan[2][i+2] - 16*valueTurunan[2][i+3] + 3*valueTurunan[2][i+4])/(12*h);
+        }
+    }
+}
+
+void limaselisihtengah(int jumlahTitik, float h){
+    for (int i = 0; i < jumlahTitik; i++)
+    {
+        if (i < 2 || i > jumlahTitik-3)
+        {
+            valueTurunan[10][i] = 0;
+        } else{
+            valueTurunan[10][i] = (valueTurunan[2][i-2] - 8*valueTurunan[2][i-1] + 8*valueTurunan[2][i+1] - valueTurunan[2][i+2])/(12*h);
+        }
+    }
 }
